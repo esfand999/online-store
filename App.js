@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,189 @@ import {
   TouchableOpacity,
   ScrollView,
   ImageBackground,
+  TextInput,
+  Button,
 } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, mode } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { Font } from 'expo';
+import { AsyncStorage } from 'react-native';
 
 const background = {
   uri:
-    'https://lolstatic-a.akamaihd.net/frontpage/apps/prod/clash-2018/en_US/a46e742ae82f9d4f9db8e34ba57873e513e727b7/assets/static/img/backgrounds/redeemed-bg.jpg',
+    'https://i.pinimg.com/originals/6c/dd/a7/6cdda74aef801e92bac9270506312ca4.jpg',
+};
+
+const SaveData = async (email, password) => {
+  console.log(email)
+  console.log(password)
+  console.log('Saving credentials');
+  await AsyncStorage.setItem(
+    '@store1:UserCredentials',
+    JSON.stringify({ userEmail: email, userPassword: password })
+  );
+  console.log('Credentials saved!');
+};
+
+const LoadData = async () => {
+  console.log('Loading data');
+
+  var item = await AsyncStorage.getItem('@store1:UserCredentials');
+  console.log(JSON.parse(item).userEmail);
+
+  var data = JSON.parse(item);
+  console.log(data);
+  console.log(data.userEmail);
+  console.log(data.userPassword);
+  console.log('Data Loaded!');
+};
+
+// const TestScreen = ({navigation}) => {
+//   return(
+//     <View>
+//       <Button title='save' onPress={SaveData}></Button>
+//       <Button title='load' onPress={LoadData}></Button>
+//     </View>
+//   );
+// }
+
+const SignUp = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  return (
+    <View style={{ flex: 1 }}>
+      <ImageBackground source={background} style={styles.background}>
+        <Text style={styles.title}>Create an account</Text>
+
+        <TextInput
+          style={styles.input}
+          onChangeText={setEmail}
+          value={email}
+          placeholder="Email"
+          placeholderTextColor="white"
+          autoCapitalize='none'
+        />
+
+        <TextInput
+          style={styles.input}
+          secureTextEntry={true}
+          onChangeText={setPassword}
+          value={password}
+          placeholder="Password"
+          placeholderTextColor="white"
+          autoCapitalize='none'
+        />
+
+        <TextInput
+          style={styles.input}
+          secureTextEntry={true}
+          onChangeText={setConfirmPassword}
+          value={confirmPassword}
+          placeholder="Confirm Password"
+          placeholderTextColor="white"
+          autoCapitalize='none'
+        />
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#d4af37',
+            alignItems: 'center',
+            paddingVertical: 8,
+            paddingHorizontal: 32,
+            justifyContent: 'center',
+            marginTop: 50,
+          }}
+          onPress={() => {
+            if (password == confirmPassword) {
+              const storing = SaveData(email, password)
+              if (storing) {
+                navigation.navigate('Login');
+              }
+            } else {
+              alert('Passwords do not match.');
+            }
+          }}>
+          <Text style={{ color: 'white', fontWeight: 'bold' }}>Sign Up</Text>
+        </TouchableOpacity>
+
+        <View
+          style={{
+            margin: 20,
+            borderBottomColor: 'white',
+            borderBottomWidth: 1,
+            width: 200,
+          }}
+        />
+
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Text style={{ color: '#d4af37', textAlign: 'center' }}>
+            Already have an account? Login!
+          </Text>
+        </TouchableOpacity>
+      </ImageBackground>
+    </View>
+  );
+};
+
+const Login = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  return (
+    <View style={{ flex: 1 }}>
+      <ImageBackground source={background} style={styles.background}>
+        <Text style={styles.title}>Login</Text>
+
+        <TextInput
+          style={styles.input}
+          onChangeText={setEmail}
+          value={email}
+          placeholder="Email"
+          placeholderTextColor="white"
+          autoCapitalize='none'
+        />
+
+        <TextInput
+          style={styles.input}
+          onChangeText={setPassword}
+          secureTextEntry={true}
+          value={password}
+          placeholder="Password"
+          placeholderTextColor="white"
+          autoCapitalize='none'
+        />
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#d4af37',
+            alignItems: 'center',
+            paddingVertical: 8,
+            paddingHorizontal: 32,
+            justifyContent: 'center',
+            marginTop: 50,
+          }}
+          onPress={() => navigation.navigate('Home Screen')}>
+          <Text style={{ color: 'white', fontWeight: 'bold' }}>Login</Text>
+        </TouchableOpacity>
+
+        <View
+          style={{
+            margin: 20,
+            borderBottomColor: 'white',
+            borderBottomWidth: 1,
+            width: 200,
+          }}
+        />
+
+        <TouchableOpacity onPress={() => navigation.navigate('Sign Up')}>
+          <Text style={{ color: '#d4af37', textAlign: 'center' }}>
+            Don't have an account? Sign Up!
+          </Text>
+        </TouchableOpacity>
+      </ImageBackground>
+    </View>
+  );
 };
 
 const HomeScreen = ({ navigation }) => {
@@ -55,11 +231,11 @@ const ProductsLists = ({ navigation }) => {
     },
     {
       id: 2,
-      item: "Warmog's Armor",
-      cost: '$3000',
+      item: "Liandry's Anguish",
+      cost: '$3400',
       description: '',
       image:
-        'https://static.wikia.nocookie.net/leagueoflegends/images/6/6e/Warmog%27s_Armor_item_HD.png',
+        'https://static.wikia.nocookie.net/leagueoflegends/images/8/85/Liandry%27s_Anguish_item_HD.png',
     },
     {
       id: 3,
@@ -94,11 +270,11 @@ const ProductsLists = ({ navigation }) => {
     },
     {
       id: 7,
-      item: "Liandry's Anguish",
-      cost: '$3400',
+      item: "Warmog's Armor",
+      cost: '$3000',
       description: '',
       image:
-        'https://static.wikia.nocookie.net/leagueoflegends/images/8/85/Liandry%27s_Anguish_item_HD.png',
+        'https://static.wikia.nocookie.net/leagueoflegends/images/6/6e/Warmog%27s_Armor_item_HD.png',
     },
     {
       id: 8,
@@ -128,7 +304,6 @@ const ProductsLists = ({ navigation }) => {
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground source={background} style={styles.background}>
-        {' '}
         <Text style={styles.title}>Products</Text>
         <View>
           {productArray.map((item) => {
@@ -166,15 +341,24 @@ const ProductDetails = ({ navigation, route }) => {
       <ImageBackground source={background} style={styles.background}>
         <Text style={styles.title}>Product Details</Text>
         <View>
-          <Text style={{ fontSize: 15, paddingBottom: 10, color: 'white' }}>
-            Item: {item.item}
-          </Text>
-          <Text style={{ fontSize: 15, paddingBottom: 10, color: 'white' }}>
-            Cost: {item.cost}
-          </Text>
-          <Text style={{ fontSize: 15, paddingBottom: 10, color: 'white' }}>
-            Description: {item.description}
-          </Text>
+          <View
+            style={{
+              backgroundColor: 'rgba(52, 52, 52, 0.8)',
+              borderColor: '#d4af37',
+              borderWidth: 2,
+              marginBottom: 20,
+              padding: 10,
+            }}>
+            <Text style={{ fontSize: 15, paddingBottom: 10, color: 'white' }}>
+              Item: {item.item}
+            </Text>
+            <Text style={{ fontSize: 15, paddingBottom: 10, color: 'white' }}>
+              Cost: {item.cost}
+            </Text>
+            <Text style={{ fontSize: 15, paddingBottom: 10, color: 'white' }}>
+              Description: {item.description}
+            </Text>
+          </View>
           <Image
             style={{
               height: 300,
@@ -228,7 +412,7 @@ const EmployeesList = ({ navigation }) => {
         'https://img.redbull.com/images/c_crop,w_4936,h_3291,x_0,y_0,f_auto,q_auto/c_scale,w_1500/redbullcom/2019/11/01/f4b59d7e-8204-4e2b-991b-8467e1c44b9a/g2-esports-mikyx',
     },
     {
-      id: 5,
+      id: 6,
       name: 'Wunder',
       position: 'Toplane',
       image:
@@ -238,8 +422,7 @@ const EmployeesList = ({ navigation }) => {
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground source={background} style={styles.background}>
-        {' '}
-        <Text style={styles.title}>Employees List</Text>{' '}
+        <Text style={styles.title}>Employees List</Text>
         <View>
           {employeeArray.map((item) => {
             return (
@@ -275,8 +458,7 @@ const EmployeeDetails = ({ navigation, route }) => {
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground source={background} style={styles.background}>
-        {' '}
-        <Text style={styles.title}>Employee Details</Text>{' '}
+        <Text style={styles.title}>Employee Details</Text>
         <View>
           <Text style={{ fontSize: 15, paddingBottom: 10, color: 'white' }}>
             Name: {item.name}
@@ -329,8 +511,7 @@ const OrdersList = ({ navigation }) => {
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground source={background} style={styles.background}>
-        {' '}
-        <Text style={styles.title}>Orders List</Text>{' '}
+        <Text style={styles.title}>Orders List</Text>
         <View>
           {ordersArray.map((item) => {
             return (
@@ -384,16 +565,37 @@ const OrderDetails = ({ navigation, route }) => {
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground source={background} style={styles.background}>
-        {' '}
-        <Text style={styles.title}>Order Details</Text>{' '}
+        <Text style={styles.title}>Order Details</Text>
         <View>
-          <Text style={{ marginTop: 20, fontSize: 15, paddingBottom: 10, color: 'white', fontWeight: 'bold', marginLeft: -50 }}>
+          <Text
+            style={{
+              marginTop: 20,
+              fontSize: 15,
+              paddingBottom: 10,
+              color: 'white',
+              fontWeight: 'bold',
+              marginLeft: -50,
+            }}>
             Order# {item.id}
           </Text>
-          <Text style={{ fontSize: 15, paddingBottom: 10, color: 'white', fontWeight: 'bold', marginLeft: -50 }}>
+          <Text
+            style={{
+              fontSize: 15,
+              paddingBottom: 10,
+              color: 'white',
+              fontWeight: 'bold',
+              marginLeft: -50,
+            }}>
             Product: {item.product}
           </Text>
-          <Text style={{ fontSize: 15, paddingBottom: 10, color: 'white', fontWeight: 'bold', marginLeft: -50 }}>
+          <Text
+            style={{
+              fontSize: 15,
+              paddingBottom: 10,
+              color: 'white',
+              fontWeight: 'bold',
+              marginLeft: -50,
+            }}>
             Price: {item.price}
           </Text>
           <Text
@@ -405,17 +607,38 @@ const OrderDetails = ({ navigation, route }) => {
               color: '#d4af37',
               fontFamily: 'Georgia',
               justifyContent: 'center',
-              marginLeft: -50 
+              marginLeft: -50,
             }}>
             Customer Details:
           </Text>
-          <Text style={{ fontSize: 15, paddingBottom: 10, color: 'white', fontWeight: 'bold', marginLeft: -50 }}>
+          <Text
+            style={{
+              fontSize: 15,
+              paddingBottom: 10,
+              color: 'white',
+              fontWeight: 'bold',
+              marginLeft: -50,
+            }}>
             Name {item.customer.name}
           </Text>
-          <Text style={{ fontSize: 15, paddingBottom: 10, color: 'white', fontWeight: 'bold', marginLeft: -50 }}>
+          <Text
+            style={{
+              fontSize: 15,
+              paddingBottom: 10,
+              color: 'white',
+              fontWeight: 'bold',
+              marginLeft: -50,
+            }}>
             Contact: {item.customer.contact}
           </Text>
-          <Text style={{ fontSize: 15, paddingBottom: 10, color: 'white', fontWeight: 'bold', marginLeft: -50 }}>
+          <Text
+            style={{
+              fontSize: 15,
+              paddingBottom: 10,
+              color: 'white',
+              fontWeight: 'bold',
+              marginLeft: -50,
+            }}>
             Address: {item.customer.address}
           </Text>
         </View>
@@ -429,7 +652,12 @@ const Stack = createStackNavigator();
 function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator mode="modal">
+        {/*<Stack.Screen name="TestScreen" component={TestScreen} />*/}
+
+        <Stack.Screen name="Sign Up" component={SignUp} />
+
+        <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Home Screen" component={HomeScreen} />
         <Stack.Screen name="Products List" component={ProductsLists} />
         <Stack.Screen name="Product Details" component={ProductDetails} />
@@ -450,13 +678,15 @@ const styles = {
   },
   button: {
     alignItems: 'center',
-    backgroundColor: '#007c64',
+    backgroundColor: 'rgba(52, 52, 52, 0.8)',
     padding: 10,
     width: 200,
     margin: 50,
+    borderColor: '#d4af37',
+    borderWidth: 2,
   },
   background: {
-    flex: '1',
+    flex: 1,
     resizeMode: 'cover',
     justifyContent: 'center',
     alignItems: 'center',
@@ -466,12 +696,23 @@ const styles = {
     marginBottom: 10,
     fontWeight: 'bold',
     color: '#d4af37',
-    fontFamily: 'Georgia',
     justifyContent: 'center',
     textAlign: 'center',
-    
+    textShadowColor: 'indigo',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 10,
+  },
+  input: {
+    height: 40,
+    marginTop: 25,
+    padding: 10,
+    borderColor: '#d4af37',
+    borderWidth: 2,
+    width: 270,
+    backgroundColor: 'rgba(52, 52, 52, 0.8)',
+    placeholderTextColor: 'white',
+    color: 'white',
   },
 };
 
 export default App;
-
